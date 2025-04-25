@@ -83,7 +83,6 @@ class MyDict:
         except KeyError:
             return default
 
-
     def keys(self):
         for deep_lst in self.__lst:
             for (k, _) in deep_lst:
@@ -101,6 +100,33 @@ class MyDict:
 
 
 d = MyDict(size=4)
+
+
+def test_collision():
+    old_hash = d._hash
+
+    def new_hash(key):
+        return 0
+
+    d._hash = new_hash
+
+    d["abc"] = 100
+    d["cba"] = 200
+
+    bucket = d._MyDict__lst[0]
+    assert len(bucket) == 2
+    assert ("abc", 100) in bucket
+    assert ("cba", 200) in bucket
+
+    del d["abc"]
+    del d["cba"]
+
+    d._hash = old_hash
+
+    print("Коллизия обработана корректно!")
+
+
+test_collision()
 
 d['a'] = 10
 assert d['a'] == 10
@@ -133,8 +159,5 @@ for i in range(5, 20):
     d[i] = i
 assert len(d) == 20
 
-
 for i in range(20):
     assert d[i] == i
-
-#итоговый Список
