@@ -1,6 +1,6 @@
 class MyDict:
-    def __init__(self, size):
-        self.__size = size
+    def __init__(self, size: int = 8):
+        self.size = size
         self.__load_factor = 0.75
         self.__count = 0
         self.__lst = [[] for _ in range(size)]
@@ -16,7 +16,7 @@ class MyDict:
                 return
         deep_lst.append((key, value))
         self.__count += 1
-        if (self.__count / self.__size) > self.__load_factor:
+        if (self.__count / self.size) > self.__load_factor:
             self._rehash()
 
     def __getitem__(self, key):
@@ -25,7 +25,7 @@ class MyDict:
         for (k, v) in deep_lst:
             if k == key:
                 return v
-        raise KeyError
+        raise KeyError(key)
 
     def __delitem__(self, key):
         key_index = self._hash(key)
@@ -35,7 +35,7 @@ class MyDict:
                 del deep_lst[i]
                 self.__count -= 1
                 return
-        raise KeyError
+        raise KeyError(key)
 
     def __contains__(self, key):
         key_index = self._hash(key)
@@ -43,7 +43,7 @@ class MyDict:
         for (k, _) in deep_lst:
             if k == key:
                 return True
-        raise KeyError
+        return False
 
     def __len__(self):
         return self.__count
@@ -54,7 +54,7 @@ class MyDict:
         return self
 
     def __next__(self):
-        while self._index < self.__size:
+        while self._index < self.size:
             deep_lst = self.__lst[self._index]
             if self._deep_index < len(deep_lst):
                 key = deep_lst[self._deep_index][0]
@@ -66,13 +66,13 @@ class MyDict:
         raise StopIteration
 
     def _hash(self, key):
-        return hash(key) % self.__size
+        return hash(key) % self.size
 
     def _rehash(self):
         old_lst = self.__lst
-        self.__size *= 2
+        self.size *= 2
         self.__count = 0
-        self.__lst = [[] for _ in range(self.__size)]
+        self.__lst = [[] for _ in range(self.size)]
         for i in old_lst:
             for (key, value) in i:
                 self[key] = value
